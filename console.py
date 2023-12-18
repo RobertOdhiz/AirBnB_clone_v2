@@ -73,7 +73,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] is '{' and pline[-1] is'}'\
+                    if pline[0] == '{' and pline[-1] == '}'\
                             and type(eval(pline)) is dict:
                         _args = pline
                     else:
@@ -122,7 +122,7 @@ class HBNBCommand(cmd.Cmd):
         if arguments[0] not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        else: 
+        else:
             try:
                 template = HBNBCommand.classes[arguments[0]]
                 new_instance = template()
@@ -139,14 +139,13 @@ class HBNBCommand(cmd.Cmd):
                             elif ("." in val):
                                 try:
                                     val = float(val)
-                                except:
+                                except Exception:
                                     pass
                             else:
                                 try:
                                     val = int(val)
-                                except:
+                                except Exception:
                                     pass
-                            
                             setattr(new_instance, pair_split[0], val)
                     storage.save()
                     print(new_instance.id)
@@ -217,7 +216,7 @@ class HBNBCommand(cmd.Cmd):
         key = c_name + "." + c_id
 
         try:
-            del(storage.all()[key])
+            del (storage.all()[key])
             storage.save()
         except KeyError:
             print("** no instance found **")
@@ -349,6 +348,7 @@ class HBNBCommand(cmd.Cmd):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
