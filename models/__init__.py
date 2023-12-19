@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """This module instantiates an object of class FileStorage"""
 from models.engine.file_storage import FileStorage
-from models.engine.db_storage import DBStorage
+from models.engine import db_storage
 from models.base_model import BaseModel
 from models.city import City
 from models.review import Review
@@ -24,7 +24,7 @@ dummy_tables = {"states": State, "cities": City,
 storage_engine = environ.get("HBNB_TYPE_STORAGE")
 
 if (storage_engine == "db"):
-    storage = DBStorage()
+    storage = db_storage.DBStorage()
     storage.reload()
 else:
     storage = FileStorage()

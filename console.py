@@ -2,7 +2,6 @@
 """ Console Module """
 import cmd
 import sys
-import models
 from models.base_model import BaseModel
 from models.__init__ import storage
 from models.user import User
@@ -11,6 +10,7 @@ from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.review import Review
+import shlex  # for splitting the line along spaces except in double quotes
 
 
 class HBNBCommand(cmd.Cmd):
@@ -114,47 +114,41 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, args):
-        """ Create an object of any class"""
-        if not args:
+    def _key_value_parser(self, args):
+        """creates a dictionary from a list of strings"""
+        new_dict = {}
+        for arg in args:
+            if "=" in arg:
+                kvp = arg.split('=', 1)
+                key = kvp[0]
+                value = kvp[1]
+                if value[0] == value[-1] == '"':
+                    value = shlex.split(value)[0].replace('_', ' ')
+                else:
+                    try:
+                        value = int(value)
+                    except:
+                        try:
+                            value = float(value)
+                        except:
+                            continue
+                new_dict[key] = value
+        return new_dict
+
+    def do_create(self, arg):
+        """Creates a new instance of a class"""
+        args = arg.split()
+        if len(args) == 0:
             print("** class name missing **")
-            return
-        arguments = args.split()
-        if arguments[0] not in HBNBCommand.classes:
-            print("** class doesn't exist **")
-            return
+            return False
+        if args[0] in HBNBCommand.classes:
+            new_dict = self._key_value_parser(args[1:])
+            instance = HBNBCommand.classes[args[0]](**new_dict)
         else:
-            try:
-                template = HBNBCommand.classes[arguments[0]]
-                new_instance = template()
-                try:
-                    for pair in arguments[1:]:
-                        pair_split = pair.split("=")
-                        if (hasattr(new_instance, pair_split[0])):
-                            val = pair_split[1]
-                            check = 0
-                            if (val.startswith('"')):
-                                val = val.strip('"')
-                                val = val.replace("\\", "")
-                                val = val.replace("_", " ")
-                            elif ("." in val):
-                                try:
-                                    val = float(val)
-                                except Exception:
-                                    pass
-                            else:
-                                try:
-                                    val = int(val)
-                                except Exception:
-                                    pass
-                            setattr(new_instance, pair_split[0], val)
-                    storage.save()
-                    print(new_instance.id)
-                    storage.save()
-                except Exception:
-                    pass
-            except Exception:
-                pass
+            print("** class doesn't exist **")
+            return False
+        print(instance.id)
+        instance.save()
 
     def help_create(self):
         """ Help information for the create method """
@@ -232,18 +226,17 @@ class HBNBCommand(cmd.Cmd):
         result = []
         if arg:
             arg = arg.split()
-            if arg[0] in models.dummy_classes:
-                current_inst = models.dummy_classes[arg[0]]
-                for i, o in models.storage.all(current_inst).items():
+            if arg[0] in HBNBCommand.classes:
+                current_inst = HBNBCommand.classes[arg[0]]
+                for i, o in storage.all(current_inst).items():
                     if i.split('.')[0] == arg[0]:
                         result.append(str(o))
             else:
                 print("** class doesn't exist **")
         else:
-            for instance, obj in models.storage.all().items():
+            for instance, obj in storage.all().items():
                 result.append(str(obj))
-        if result:
-            print(result)
+        print(result)
 
     def help_all(self):
         """ Help information for the all command """
