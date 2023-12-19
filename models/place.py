@@ -9,6 +9,15 @@ from os import environ
 
 storage_engine = environ.get("HBNB_TYPE_STORAGE")
 
+if storage_engine == 'db':
+    place_amenity = Table('place_amenity', Base.metadata,
+                          Column('place_id', String(60),
+                                 ForeignKey('places.id'),
+                                 primary_key=True, nullable=False),
+                          Column('amenity_id', String(60),
+                                 ForeignKey('amenities.id'),
+                                 primary_key=True, nullable=False))
+
 
 class Place(BaseModel, Base):
     """
@@ -28,6 +37,10 @@ class Place(BaseModel, Base):
         latitude = Column(Float, nullable=True)
         longitude = Column(Float, nullable=True)
         reviews = relationship("Review", backref="place")
+        amenities = relationship("Amenity",
+                                 secondary=place_amenity,
+                                 back_populates="place_amenities",
+                                 viewonly=False)
     else:
         city_id = ""
         user_id = ""
@@ -49,3 +62,20 @@ class Place(BaseModel, Base):
                 if rev.place_id == self.id:
                     rev.list_reviews.append()
             return list_reviews
+
+        @property
+        def amenities(self):
+            """getter function for amenity attribute"""
+            result = []
+            temp = models.dummy_classes['Amenity']
+            for a in models.storage.all(temp).values():
+                if a in self.amenity_ids:
+                    result.append(a)
+            return result
+
+        @amenities.setter
+        def amenities(self, obj):
+            """ setter for amenities class """
+            temp = models.dummy_classes['Amenity']
+            if (isinstance(obj, models.storage.all(temp))):
+                self.amenity_ids.append(obj.id)
