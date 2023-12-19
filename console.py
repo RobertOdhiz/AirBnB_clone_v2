@@ -151,10 +151,10 @@ class HBNBCommand(cmd.Cmd):
                     storage.save()
                     print(new_instance.id)
                     storage.save()
-                except Exception as e:
-                    print("Error found {}".format(e))
-            except Exception as e:
-                print("Error {}".format(e))
+                except Exception:
+                    pass
+            except Exception:
+                pass
 
     def help_create(self):
         """ Help information for the create method """
