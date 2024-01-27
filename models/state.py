@@ -26,7 +26,7 @@ class State(BaseModel, Base):
             """cities list
             """
             result = []
-            for j, i in models.storage.all(models.city.City).items():
-                if (i.state_id == self.id):
-                    result.append(i)
+            for j, l in models.storage.all(models.city.City).items():
+                if (l.state_id == self.id):
+                    result.append(l)
             return result
