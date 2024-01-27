@@ -2,7 +2,7 @@
 """
 Module with script that starts a flask web project
 """
-from flask import Flask
+from flask import Flask, render_template
 
 
 app = Flask(__name__)
@@ -33,6 +33,18 @@ def py_text(text='is cool'):
     """ """
     text = text.replace("_", " ")
     return 'Python {}'.format(text)
+
+
+@app.route('/number/<int:n>', strict_slashes=False)
+def number_n(n):
+    """ """
+    return "{} is a number".format(n)
+
+
+@app.route('/number_template/<int:n>', strict_slashes=False)
+def num_template(n):
+    """ """
+    return render_template('5-number.html', number=n)
 
 
 if __name__ == '__main__':
