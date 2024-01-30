@@ -21,7 +21,7 @@ class DBStorage:
         user = getenv('HBNB_MYSQL_USER')
         pwd = getenv('HBNB_MYSQL_PWD')
         host = getenv('HBNB_MYSQL_HOST')
-        database =  getenv('HBNB_MYSQL_DB')
+        database = getenv('HBNB_MYSQL_DB')
         self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'.format(
                                       user, pwd, host, database),
                                       pool_pre_ping=True)
@@ -33,7 +33,7 @@ class DBStorage:
         """ Query on the current database session """
         objects = {}
         if cls:
-            if type(cls) == str:
+            if type(cls) is str:
                 cls = dummy_classes[cls]
             for obj in self.__session.query(cls).all():
                 key = "{}.{}".format(obj.__class__.__name__, obj.id)
@@ -61,5 +61,6 @@ class DBStorage:
     def reload(self):
         """ creates all tables in the database """
         Base.metadata.create_all(self.__engine)
-        session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        session_factory = sessionmaker(
+                bind=self.__engine, expire_on_commit=False)
         self.__session = scoped_session(session_factory)
